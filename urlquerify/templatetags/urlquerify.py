@@ -61,7 +61,7 @@ def token_named_args(bits, arg_names):
 
 
 @register.tag
-def update_state(parser, token):
+def urlquerify(parser, token):
     bits = token.split_contents()
     state_name = bits[1]
     remaining_bits = bits[2:]
