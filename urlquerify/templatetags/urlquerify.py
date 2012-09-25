@@ -17,10 +17,11 @@ class UrlquerifyNode(template.Node):
     def render(self, context):
         state = deepcopy(resolve_variable(self.state_var_name, context))
 
-        for key, val in self.update_items.iteritems():
-            self.update_items[key] = val.resolve(context)
+        update_items = deepcopy(self.update_items)
+        for key, val in update_items.iteritems():
+            update_items[key] = val.resolve(context)
 
-        state.update(**self.update_items)
+        state.update(**update_items)
 
         if self.only_items:
             state.only(*self.only_items)
@@ -63,7 +64,7 @@ def token_named_args(bits, arg_names):
 @register.tag
 def urlquerify(parser, token):
     bits = token.split_contents()
-    state_name = bits[1]
+    state_var_name = bits[1]
     remaining_bits = bits[2:]
 
     update_items = token_kwargs(remaining_bits, parser, support_legacy=True)
@@ -72,4 +73,4 @@ def urlquerify(parser, token):
     remove_items = named_args.get('remove', '').split(',')
     only_items = named_args.get('only', '').split(',')
 
-    return UrlquerifyNode(state_name, update_items, remove_items, only_items)
+    return UrlquerifyNode(state_var_name, update_items, remove_items, only_items)
