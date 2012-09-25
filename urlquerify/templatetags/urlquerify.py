@@ -60,7 +60,7 @@ def token_named_args(bits, arg_names):
                 has_correct_value = False
 
             # If next argument is keyword block (simple check for now)
-            elif bits[next_index].find('='):
+            elif bits[next_index].find('=') != -1:
                 has_correct_value = False
 
             if not has_correct_value:
