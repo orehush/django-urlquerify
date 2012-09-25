@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 import urlquerify
 
 setup(
-    name='wr-django-urlquerify',
+    name='django-urlquerify',
     version=urlquerify.__version__,
     author=urlquerify.__author__,
     author_email=urlquerify.__contact__,
