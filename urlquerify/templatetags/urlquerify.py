@@ -18,8 +18,12 @@ class UrlquerifyNode(template.Node):
         state = deepcopy(resolve_variable(self.state_var_name, context))
 
         update_items = deepcopy(self.update_items)
-        for key, val in update_items.iteritems():
-            update_items[key] = val.resolve(context)
+        for key, val in update_items.items():
+            new_value = val.resolve(context)
+            if new_value:
+                update_items[key] = new_value
+            else:
+                del update_items[key]
 
         state.update(**update_items)
 
@@ -43,11 +47,23 @@ def token_named_args(bits, arg_names):
     for name in arg_names:
         try:
             index = bits.index(name)
+            next_index = index + 1
 
-            # Two possible incorrect situations:
-            #   1. if argument name is in end of list and has no value next of it
-            #   2. If next argument is another reserved argument name
-            if len(bits) == index + 1 or bits[index + 1] in arg_names:
+            has_correct_value = True
+
+            #  If argument name is in end of list and has no value next of it
+            if len(bits) == next_index:
+                has_correct_value = False
+
+            #  If next argument is another reserved argument name
+            elif bits[next_index] in arg_names:
+                has_correct_value = False
+
+            # If next argument is keyword block (simple check for now)
+            elif bits[next_index].find('='):
+                has_correct_value = False
+
+            if not has_correct_value:
                 raise template.TemplateSyntaxError("%r named argument expected a value after it" % bits[index])
 
             else:

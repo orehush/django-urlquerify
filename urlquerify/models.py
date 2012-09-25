@@ -1,11 +1,10 @@
 
 
 class QueryState(object):
-
     def __init__(self, request, initial=None):
         self._state = {}
         self._state.update(initial or {})
-        self._state.update(request.GET)
+        self._state.update(dict(request.GET.items()))
 
     def update(self, **kwargs):
         self._state.update(kwargs)
@@ -30,7 +29,7 @@ class QueryState(object):
             params_str += key
 
             if self._state[key] != '':
-                params_str += '='+unicode(self._state[key])
+                params_str += '=' + unicode(self._state[key])
             params_str += '&'
 
         return params_str[:-1]
