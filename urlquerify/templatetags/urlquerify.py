@@ -1,6 +1,7 @@
+import re
 from copy import deepcopy
 from django import template
-from django.template.base import token_kwargs, resolve_variable, kwarg_re
+from django.template.base import token_kwargs, resolve_variable
 register = template.Library()
 
 
@@ -34,6 +35,8 @@ class UrlquerifyNode(template.Node):
 
         return state.serialize()
 
+
+kwarg_re = re.compile(r"\w+=.+")
 
 def token_named_args(bits, arg_names):
     if not bits or not arg_names:
