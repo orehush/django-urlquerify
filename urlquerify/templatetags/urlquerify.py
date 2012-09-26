@@ -1,6 +1,6 @@
 from copy import deepcopy
 from django import template
-from django.template.base import token_kwargs, resolve_variable
+from django.template.base import token_kwargs, resolve_variable, kwarg_re
 register = template.Library()
 
 
@@ -59,8 +59,8 @@ def token_named_args(bits, arg_names):
             elif bits[next_index] in arg_names:
                 has_correct_value = False
 
-            # If next argument is keyword block (simple check for now)
-            elif bits[next_index].find('=') != -1:
+            # If next argument is keyword block
+            elif kwarg_re.match(bits[next_index]):
                 has_correct_value = False
 
             if not has_correct_value:
