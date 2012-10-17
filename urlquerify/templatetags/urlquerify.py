@@ -33,7 +33,8 @@ class UrlquerifyNode(template.Node):
 
         state.remove(*self.remove_items)
 
-        return state.serialize()
+        query = state.serialize() or '.'
+        return query
 
 
 kwarg_re = re.compile(r"\w+=.+")
