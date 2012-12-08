@@ -2,12 +2,18 @@ import re
 from copy import deepcopy
 from django import template
 from django.template.base import token_kwargs, resolve_variable
+from ..models import QueryState
+
+
 register = template.Library()
 
 
 class UrlquerifyNode(template.Node):
-    def __init__(self, state_var_name, update_items=None, remove_items=None, only_items=None):
-        self.state_var_name = state_var_name
+    """
+    Simple filter that takes request.GET and updates/deletes/adds params into it
+    Requirements: django.core.context_processors.request should be switched on!
+    """
+    def __init__(self, update_items=None, remove_items=None, only_items=None):
         self.update_items = update_items or {}
         self.remove_items = remove_items or []
         self.only_items = only_items or []
@@ -16,7 +22,7 @@ class UrlquerifyNode(template.Node):
         return '<UrlquerifyNode>'
 
     def render(self, context):
-        state = deepcopy(resolve_variable(self.state_var_name, context))
+        state = QueryState(resolve_variable('request', context))
 
         update_items = deepcopy(self.update_items)
         for key, val in update_items.items():
@@ -84,8 +90,7 @@ def token_named_args(bits, arg_names):
 @register.tag
 def urlquerify(parser, token):
     bits = token.split_contents()
-    state_var_name = bits[1]
-    remaining_bits = bits[2:]
+    remaining_bits = bits[1:]
 
     update_items = token_kwargs(remaining_bits, parser, support_legacy=True)
 
@@ -93,4 +98,4 @@ def urlquerify(parser, token):
     remove_items = named_args.get('remove', '').split(',')
     only_items = named_args.get('only', '').split(',')
 
-    return UrlquerifyNode(state_var_name, update_items, remove_items, only_items)
+    return UrlquerifyNode(update_items, remove_items, only_items)
