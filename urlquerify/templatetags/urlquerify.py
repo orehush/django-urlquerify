@@ -1,7 +1,7 @@
 import re
 from copy import deepcopy
 from django import template
-from django.template.base import token_kwargs, resolve_variable
+from django.template.base import token_kwargs, Variable
 from ..models import QueryState
 
 
@@ -22,7 +22,7 @@ class UrlquerifyNode(template.Node):
         return '<UrlquerifyNode>'
 
     def render(self, context):
-        state = QueryState(resolve_variable('request', context))
+        state = QueryState(Variable('request').resolve(context))
 
         update_items = deepcopy(self.update_items)
         for key, val in update_items.items():
